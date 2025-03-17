@@ -16,3 +16,7 @@ GET http://localhost:3001/api/persons
 ###
 
 DELETE http://localhost:3001/api/persons/5
+
+###ONLINE REQUEST!!!
+
+GET fullstackopennode-production-914c.up.railway.app/api/persons
