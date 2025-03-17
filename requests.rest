@@ -1,21 +1,21 @@
-GET http://localhost:3001/api/persons/1
+#GET http://localhost:3001/api/persons/1
 
 ###
 
-POST http://localhost:3001/api/persons
-Content-Type: application/json
-
-{
-  "name": "Jimmy",
-  "number": 123456789
-}
-
-###
-GET http://localhost:3001/api/persons
+#POST http://localhost:3001/api/persons
+#Content-Type: application/json
+#
+#{
+#  "name": "Jimmy",
+#  "number": 123456789
+#}
 
 ###
+#GET http://localhost:3001/api/persons
 
-DELETE http://localhost:3001/api/persons/5
+###
+
+#DELETE http://localhost:3001/api/persons/5
 
 ###ONLINE REQUEST!!!
 
