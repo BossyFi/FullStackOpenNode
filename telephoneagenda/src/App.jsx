@@ -70,7 +70,7 @@ const App = () => {
 
 
         if (newNumber.length === 0 || newName.length === 0) {
-            alert("Some of the fields are empty")
+            ShowErrorMessage("Name and number are required")
             return
         }
 
@@ -91,7 +91,7 @@ const App = () => {
         }
 
         if (persons.find((person) => person.number === newNumber)) {
-            alert(`${newNumber} is already added to phonebook`)
+            ShowErrorMessage(`${newName} is already added to phonebook`)
             setNewNumber('')
             return
         }
