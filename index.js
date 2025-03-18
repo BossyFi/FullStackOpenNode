@@ -75,7 +75,7 @@ app.get('/api/persons/:id', (request, response, next) => {
         })
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
     if (!body.name || !body.number) {
@@ -94,8 +94,8 @@ app.post('/api/persons', (request, response) => {
 
         person.save()
             .then(savedPerson => response.json(savedPerson))
-            .catch(error => response.status(500).json({error: 'failed to save person'}));
-    }).catch(error => response.status(500).json({error: 'database error'}));
+            .catch(error => next(error));
+    }).catch(error => next(error));
 });
 
 app.get('/info', (request, response, next) => {
@@ -117,7 +117,11 @@ app.put('/api/persons/:id', (request, response, next) => {
         return response.status(400).json({error: 'Name and number are required'});
     }
 
-    Person.findByIdAndUpdate(id, {name: body.name, number: body.number}, {new: true})
+    Person.findByIdAndUpdate(id, {name: body.name, number: body.number}, {
+        new: true,
+        runValidators: true,
+        context: 'query'
+    })
         .then(updatedPerson => {
             if (updatedPerson) {
                 response.json(updatedPerson);
