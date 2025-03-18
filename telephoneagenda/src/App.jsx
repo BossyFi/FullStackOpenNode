@@ -91,7 +91,7 @@ const App = () => {
         }
 
         if (persons.find((person) => person.number === newNumber)) {
-            ShowErrorMessage(`${newName} is already added to phonebook`)
+            ShowErrorMessage(`${newNumber} is already added to phonebook`)
             setNewNumber('')
             return
         }
