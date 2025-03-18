@@ -81,7 +81,9 @@ const App = () => {
                         setPersons(persons.map((person) => person.id !== response.data.id ? person : response.data))
                         setPersonAux(persons.map((person) => person.id !== response.data.id ? person : response.data))
                         ShowMessage(`${newName} updated in phonebook`)
-                    })
+                    }).catch((error) => {
+                    ShowErrorMessage(error.response.data.error)
+                })
             }
             setNewName('')
             setNewNumber('')
@@ -102,7 +104,9 @@ const App = () => {
                 setNewName('')
                 setNewNumber('')
                 ShowMessage(`${newName} added to phonebook`)
-            })
+            }).catch((error) => {
+            ShowErrorMessage(error.response.data.error)
+        })
 
 
     }
