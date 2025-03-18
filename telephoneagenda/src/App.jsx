@@ -111,11 +111,11 @@ const App = () => {
         if (window.confirm(`Are you sure you want to delete ${name}?`)) {
             personService
                 .remove(id)
-                .then((response) => {
+                .then(() => {
                     setPersons(persons.filter((person) => person.id !== id))
                     setPersonAux(persons.filter((person) => person.id !== id))
                     ShowMessage(`${name} deleted from phonebook`)
-                }).catch((error) => {
+                }).catch(() => {
                 ShowErrorMessage(`Information of ${name} has already been removed from server`)
                 setPersons(persons.filter((person) => person.id !== id))
                 setPersonAux(persons.filter((person) => person.id !== id))
