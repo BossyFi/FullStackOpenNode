@@ -145,18 +145,27 @@ app.get('/info', (request, response) => {
 app.put('/api/persons/:id', (request, response) => {
     const id = request.params.id;
     const body = request.body;
+
     console.log("ID", id);
     console.log("BODY", body);
 
-    const person = new Person({
-        name: body.name,
-        number: body.number,
-    });
+    if (!body.name || !body.number) {
+        return response.status(400).json({ error: 'Name and number are required' });
+    }
 
-    Person.findByIdAndUpdate(id, person, {new: true}).then(person => {
-        response.json(person);
-    })
-})
+    Person.findByIdAndUpdate(id, { name: body.name, number: body.number }, { new: true })
+        .then(updatedPerson => {
+            if (updatedPerson) {
+                response.json(updatedPerson);
+            } else {
+                response.status(404).send('Person not found').end();
+            }
+        })
+        .catch(error => {
+            console.error('Error updating person:', error);
+            response.status(500).send('Error updating person').end();
+        });
+});
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id;
