@@ -142,6 +142,18 @@ app.get('/info', (request, response) => {
     // response.send(`<p>Phonebook has info for ${notes.length} people</p><p>${date}</p>`)
 })
 
+app.put('/api/persons/:id', (request, response) => {
+    const id = request.params.id;
+    const body = request.body;
+
+    const person = {
+        name: body.name,
+        number: body.number,
+    };
+
+    Person.findByIdAndUpdate(id, person, {new: true})
+})
+
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id;
 
