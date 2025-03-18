@@ -145,13 +145,17 @@ app.get('/info', (request, response) => {
 app.put('/api/persons/:id', (request, response) => {
     const id = request.params.id;
     const body = request.body;
+    console.log("ID", id);
+    console.log("BODY", body);
 
-    const person = {
+    const person = new Person({
         name: body.name,
         number: body.number,
-    };
+    });
 
-    Person.findByIdAndUpdate(id, person, {new: true})
+    Person.findByIdAndUpdate(id, person, {new: true}).then(person => {
+        response.json(person);
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
