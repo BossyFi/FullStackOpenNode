@@ -40,13 +40,13 @@ const App = () => {
     const [message, setMessage] = useState(null)
     const [errorMessage, setErrorMessage] = useState(null)
 
-    useEffect(() => {
-        personService.getAll()
-            .then((response) => {
-                setPersons(response.data)
-                setPersonAux(response.data)
-            })
-    }, [])
+    // useEffect(() => {
+    //     personService.getAll()
+    //         .then((response) => {
+    //             setPersons(response.data)
+    //             setPersonAux(response.data)
+    //         })
+    // }, [])
 
     const ShowMessage = (message) => {
         setMessage(message)
