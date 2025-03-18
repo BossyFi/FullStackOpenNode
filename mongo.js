@@ -1,17 +1,19 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
 
-if (process.argv.length < 3) {
-    console.log('give password as argument')
-    process.exit(1)
-}
+
+//Now the password is in the environment variable MONGODB_URI
+// if (process.argv.length < 3) {
+//     console.log('give password as argument')
+//     process.exit(1)
+// }
 
 
 const password = process.argv[2]
 const name = process.argv[3]
 const number = process.argv[4]
 
-const url =
-    `mongodb+srv://bossyfi:${password}@cluster0.jjcsq.mongodb.net/TelephoneAgendaApp?retryWrites=true&w=majority`
+const url = process.env.MONGODB_URI
 
 mongoose.set('strictQuery', false)
 
