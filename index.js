@@ -15,6 +15,17 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use(cors())
 app.use(express.static('dist'))
 
+const generateId = () => {
+    const maxId = notes.length > 0
+        ? Math.max(...notes.map(n => n.id))
+        : 0
+    return maxId + 1
+}
+
+const generateRandomId = () => {
+    return Math.floor(Math.random() * 1000000)
+}
+
 let notes = [
     {
         "id": 1,
@@ -37,6 +48,7 @@ let notes = [
         "number": "39-23-6423122"
     }
 ]
+
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -45,10 +57,9 @@ app.get('/api/persons', (request, response) => {
     Person.find({}).then(notes => {
         response.json(notes)
     })
-    // response.json(notes)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
 
     Person.findById(id)
@@ -60,29 +71,9 @@ app.get('/api/persons/:id', (request, response) => {
             }
         })
         .catch(error => {
-            response.status(400).send('Malformatted ID').end()
+            next(error);
         })
-    // const id = Number(request.params.id)
-    // const note = notes.find(note => note.id === id)
-    //
-    // if (note) {
-    //     response.json(note)
-    // } else {
-    //     response.status(404)
-    //     response.send('Person not found, try another ID').end()
-    // }
 })
-
-const generateId = () => {
-    const maxId = notes.length > 0
-        ? Math.max(...notes.map(n => n.id))
-        : 0
-    return maxId + 1
-}
-
-const generateRandomId = () => {
-    return Math.floor(Math.random() * 1000000)
-}
 
 app.post('/api/persons', (request, response) => {
     const body = request.body;
@@ -105,55 +96,28 @@ app.post('/api/persons', (request, response) => {
             .then(savedPerson => response.json(savedPerson))
             .catch(error => response.status(500).json({error: 'failed to save person'}));
     }).catch(error => response.status(500).json({error: 'database error'}));
-
-    // const body = request.body
-    // if (!body.name || !body.number) {
-    //     return response.status(400).json({
-    //         error: 'content missing'
-    //     })
-    // }
-    //
-    // const nameExists = notes.find(note => note.name === body.name)
-    // if (nameExists) {
-    //     return response.status(400).json({
-    //         error: 'name must be unique'
-    //     })
-    // }
-    //
-    // const note = {
-    //     name: body.name,
-    //     number: body.number,
-    //     id: generateRandomId()
-    // }
-    // notes = notes.concat(note)
-    // response.json(note)
 });
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
     Person.countDocuments({})
         .then(count => {
             const date = new Date();
             response.send(`<p>Phonebook has info for ${count} people</p><p>${date}</p>`);
         })
         .catch(error => {
-            response.status(500).send('Database error').end();
+            next(error);
         });
-    // const date = new Date()
-    // response.send(`<p>Phonebook has info for ${notes.length} people</p><p>${date}</p>`)
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
     const body = request.body;
 
-    console.log("ID", id);
-    console.log("BODY", body);
-
     if (!body.name || !body.number) {
-        return response.status(400).json({ error: 'Name and number are required' });
+        return response.status(400).json({error: 'Name and number are required'});
     }
 
-    Person.findByIdAndUpdate(id, { name: body.name, number: body.number }, { new: true })
+    Person.findByIdAndUpdate(id, {name: body.name, number: body.number}, {new: true})
         .then(updatedPerson => {
             if (updatedPerson) {
                 response.json(updatedPerson);
@@ -162,12 +126,11 @@ app.put('/api/persons/:id', (request, response) => {
             }
         })
         .catch(error => {
-            console.error('Error updating person:', error);
-            response.status(500).send('Error updating person').end();
+            next(error);
         });
 });
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
 
     Person.findByIdAndDelete(id)
@@ -179,19 +142,25 @@ app.delete('/api/persons/:id', (request, response) => {
             }
         })
         .catch(error => {
-            response.status(400).send('Malformatted ID').end();
+            next(error);
         });
-    // const id = Number(request.params.id)
-    // const note = notes.find(note => note.id === id)
-    // if (note) {
-    //     notes = notes.filter(note => note.id !== id)
-    //     response.json(notes)
-    //     response.status(204).end()
-    // } else {
-    //     response.status(404)
-    //     response.send('Person not found, try another ID').end()
-    // }
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: 'Malformatted ID'})
+    }
+
+    if (error.name === 'ValidationError') {
+        return response.status(400).send({error: error.message})
+    }
+
+    return response.status(500).send({error: 'Internal Server Error'})
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
